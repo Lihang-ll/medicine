@@ -1,0 +1,544 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zxx" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Ayurvedic - Medical Template</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="assets/images/cropped-favicon-32x32.png"/>
+
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/plugin.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/dashboard.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/fonts/flaticon.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/css/icons.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="assets/fonts/line-icons.css" type="text/css"/>
+    <link rel="stylesheet" href="common/font-awesome/css/font-awesome.min.css">
+
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* 设置词云容器的样式 */
+        .tagcloud {
+            display: inline-block;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="preloader">
+    <div id="status"></div>
+</div>
+
+<div th:replace="common/common-bar::#header"></div>
+
+<div id="dashboard">
+    <div class="container">
+        <div class="dashboard-main">
+            <div class="row">
+                <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                    <div th:replace="common/common-bar::#dashboard-sidebar(cur='system')"></div>
+                </div>
+                <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                    <div class="dashboard-content">
+                        <div class="dashboard-form mb-4">
+                            <div class="row">
+
+                                <div class="col-lg-3">
+                                    <div class="dashboard-stat mb-4">
+                                        <div class="dashboard-stat-content">
+                                            <h4 th:text="${illnessCount}"></h4>
+                                            <span>系统疾病数量</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="dashboard-stat mb-4">
+                                        <div class="dashboard-stat-content">
+                                            <h4 th:text="${doctorCount}"></h4>
+                                            <span>医生数量</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="dashboard-stat mb-4">
+                                        <div class="dashboard-stat-content">
+                                            <h4 th:text="${medicineCount}"></h4>
+                                            <span>药品数量</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="dashboard-stat mb-4">
+                                        <div class="dashboard-stat-content">
+                                            <h4 th:text="${feedbackCount}"></h4>
+                                            <span>反馈信息数量</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-lg-7 col-md-12 col-xs-12 traffic">
+                                    <div class="dashboard-list-box with-icons">
+                                        <div class="dashboard-title">
+                                            <h4 class="mb-0">医师排行榜</h4>
+                                            <p class="mb-0">统计医师的综合评分 TOP 20</p>
+                                        </div>
+                                        <div class="table-responsive table-desi"
+                                             style="height: 300px; overflow-y: hidden" id="scroll-table1">
+                                            <table class="basic-table table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>排名</th>
+                                                    <th>姓名</th>
+                                                    <th>单位</th>
+                                                    <th>科室</th>
+                                                    <th>评分</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="goodDoctor,itemStat : ${goodDoctors}">
+                                                    <td th:text="'NO'+ ${itemStat.index+1}"></td>
+                                                    <td th:text="${goodDoctor.name}"></td>
+                                                    <td th:text="${goodDoctor.workAddress}"></td>
+                                                    <td th:text="${goodDoctor.illnessKind}"></td>
+                                                    <td th:text="${goodDoctor.evaluation}"></td>
+
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-12 col-xs-12 traffic">
+                                    <div class="dashboard-list-box with-icons">
+                                        <div class="dashboard-title">
+                                            <h4 class="mb-0">搜索热词</h4>
+                                            <p class="mb-0">统计高频率搜索关键词 TOP 20</p>
+                                        </div>
+                                        <div class="table-responsive table-desi"
+                                             style="height: 300px; overflow-y: hidden" id="scroll-table2">
+                                            <table class="basic-table table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>排名</th>
+                                                    <th>搜索关键词</th>
+                                                    <th>搜索次数</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="hot-search-tbody">
+                                                <tr th:each="item,itemStat : ${hotSearch}">
+                                                    <td th:text="'NO'+ ${itemStat.index+1}"></td>
+                                                    <td th:text="${item.name}"></td>
+                                                    <td th:text="${item.count}"></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <canvas id="myChart1"></canvas>
+                                    <span id="myChart1Labels" th:utext="${illnessJson}" style="display:none"></span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="col-6" id="scroll-table3" style="height: 400px;width: 100%; overflow-y: hidden">
+                                        <span class="tag tagcloud" style="">上下颌骨</span>
+                                        <span class="tag tagcloud" style="">上呼吸道感染</span>
+                                        <span class="tag tagcloud" style="">中毒</span>
+                                        <span class="tag tagcloud" style="">不孕不育</span>
+                                        <span class="tag tagcloud" style="">不孕症</span>
+                                        <span class="tag tagcloud" style="">丙肝及各种肝硬化</span>
+                                        <span class="tag tagcloud" style="">中医养生理</span>
+                                        <span class="tag tagcloud" style="">中耳显微及微创手术</span>
+                                        <span class="tag tagcloud" style="">中西医常见病</span>
+                                        <span class="tag tagcloud" style="">中西医结合治疗皮肤科常见病</span>
+                                        <span class="tag tagcloud" style="">临床医学</span>
+                                        <span class="tag tagcloud" style="">主动健康</span>
+                                        <span class="tag tagcloud" style="">慢性咽炎</span>
+                                        <span class="tag tagcloud" style="">久咳</span>
+                                        <span class="tag tagcloud" style="">乳腺癌放化疗</span>
+                                        <span class="tag tagcloud" style="">亚健康状态</span>
+                                        <span class="tag tagcloud" style="">产检结果解读</span>
+                                        <span class="tag tagcloud" style="">产科优生优育</span>
+                                        <span class="tag tagcloud" style="">亲子教育</span>
+                                        <span class="tag tagcloud" style="">人工晶体脱位</span>
+                                        <span class="tag tagcloud" style="">传染病</span>
+                                        <span class="tag tagcloud" style="">亚健康状态</span>
+                                        <span class="tag tagcloud" style="">低蛋白血症</span>
+                                        <span class="tag tagcloud" style="">体癣</span>
+                                        <span class="tag tagcloud" style="">便秘</span>
+                                        <span class="tag tagcloud" style="">儿常见病和多发病</span>
+                                        <span class="tag tagcloud" style="">保髋</span>
+                                        <span class="tag tagcloud" style="">儿科肝病</span>
+                                        <span class="tag tagcloud" style="">儿童保健科相关疾病</span>
+                                        <span class="tag tagcloud" style="">呼吸道</span>
+                                        <span class="tag tagcloud" style="">神经系统</span>
+                                        <span class="tag tagcloud" style="">营养不良</span>
+                                        <span class="tag tagcloud" style="">先兆流产</span>
+                                        <span class="tag tagcloud" style="">先心病</span>
+                                        <span class="tag tagcloud" style="">心脏病</span>
+                                        <span class="tag tagcloud" style="">心脑血管疾病</span>
+                                        <span class="tag tagcloud" style="">心血管病</span>
+                                        <span class="tag tagcloud" style="">关节疼痛</span>
+                                        <span class="tag tagcloud">糖尿病</span>
+                                        <span class="tag tagcloud">高血压</span>
+                                        <span class="tag tagcloud">肿瘤</span>
+                                        <span class="tag tagcloud">乳腺癌</span>
+                                        <span class="tag tagcloud">胃癌</span>
+                                        <span class="tag tagcloud">肺癌</span>
+                                        <span class="tag tagcloud">白血病</span>
+                                        <span class="tag tagcloud">肝癌</span>
+                                        <span class="tag tagcloud">皮肤癌</span>
+                                        <span class="tag tagcloud">宫颈癌</span>
+                                        <span class="tag tagcloud">脊柱侧弯</span>
+                                        <span class="tag tagcloud">骨质疏松</span>
+                                        <span class="tag tagcloud">高胆固醇</span>
+                                        <span class="tag tagcloud">高血糖</span>
+                                        <span class="tag tagcloud">甲状腺疾病</span>
+                                        <span class="tag tagcloud">艾滋病</span>
+                                        <span class="tag tagcloud">肾衰竭</span>
+                                        <span class="tag tagcloud">肾结石</span>
+                                        <span class="tag tagcloud">肥胖症</span>
+                                        <span class="tag tagcloud">抑郁症</span>
+                                        <span class="tag tagcloud">焦虑症</span>
+                                        <span class="tag tagcloud">自闭症</span>
+                                        <span class="tag tagcloud">失眠</span>
+                                        <span class="tag tagcloud">焦虑</span>
+                                        <span class="tag tagcloud">骨折</span>
+                                        <span class="tag tagcloud">腰椎间盘突出</span>
+                                        <span class="tag tagcloud">肩周炎</span>
+                                        <span class="tag tagcloud">风湿病</span>
+                                        <span class="tag tagcloud">痛风</span>
+                                        <span class="tag tagcloud">过敏性疾病</span>
+                                        <span class="tag tagcloud">哮喘</span>
+                                        <span class="tag tagcloud">支气管炎</span>
+                                        <span class="tag tagcloud">感冒</span>
+                                        <span class="tag tagcloud">咳嗽</span>
+                                        <span class="tag tagcloud">胃炎</span>
+                                        <span class="tag tagcloud">胃溃疡</span>
+                                        <span class="tag tagcloud">消化不良</span>
+                                        <span class="tag tagcloud">胃食管反流</span>
+                                        <span class="tag tagcloud">结肠炎</span>
+                                        <span class="tag tagcloud">便秘</span>
+                                        <span class="tag tagcloud">腹泻</span>
+                                        <span class="tag tagcloud">肠胃炎</span>
+                                        <span class="tag tagcloud">内分泌失调</span>
+                                        <span class="tag tagcloud">痛经</span>
+                                        <span class="tag tagcloud">月经不调</span>
+                                        <span class="tag tagcloud">宫外孕</span>
+                                        <span class="tag tagcloud">不孕症</span>
+                                        <span class="tag tagcloud">多囊卵巢综合症</span>
+                                        <span class="tag tagcloud">男性不育</span>
+                                        <span class="tag tagcloud">前列腺炎</span>
+                                        <span class="tag tagcloud">前列腺增生</span>
+                                        <span class="tag tagcloud">性功能障碍</span>
+                                        <span class="tag tagcloud">白发</span>
+                                        <span class="tag tagcloud">脱发</span>
+                                        <span class="tag tagcloud">耳鸣</span>
+                                        <span class="tag tagcloud">耳聋</span>
+                                        <span class="tag tagcloud">视力下降</span>
+                                        <span class="tag tagcloud">近视</span>
+                                        <span class="tag tagcloud">远视</span>
+                                        <span class="tag tagcloud">斜视</span>
+                                        <span class="tag tagcloud">眼疲劳</span>
+                                        <span class="tag tagcloud">眼疾</span>
+                                        <span class="tag tagcloud">眼角膜炎</span>
+                                        <span class="tag tagcloud">白内障</span>
+                                        <span class="tag tagcloud">青光眼</span>
+                                        <span class="tag tagcloud">眼底病</span>
+                                        <span class="tag tagcloud">皮肤病</span>
+                                        <span class="tag tagcloud">痤疮</span>
+                                        <span class="tag tagcloud">湿疹</span>
+                                        <span class="tag tagcloud">银屑病</span>
+                                        <span class="tag tagcloud">皮肤过敏</span>
+                                        <span class="tag tagcloud">脚气</span>
+                                        <span class="tag tagcloud">湿疹</span>
+                                        <span class="tag tagcloud">牛皮癣</span>
+                                        <span class="tag tagcloud">痣</span>
+                                        <span class="tag tagcloud">皱纹</span>
+                                        <span class="tag tagcloud">过敏性紫癜</span>
+                                        <span class="tag tagcloud">麻疹</span>
+                                        <span class="tag tagcloud">流感</span>
+                                        <span class="tag tagcloud">皮肤癌</span>
+                                        <span class="tag tagcloud">中暑</span>
+                                        <span class="tag tagcloud">气喘</span>
+                                        <span class="tag tagcloud">肺炎</span>
+                                        <span class="tag tagcloud">肺气肿</span>
+                                        <span class="tag tagcloud">慢性支气管炎</span>
+                                        <span class="tag tagcloud">风疹</span>
+                                        <span class="tag tagcloud">黄疸</span>
+                                        <span class="tag tagcloud">肝炎</span>
+                                        <span class="tag tagcloud">肝硬化</span>
+                                        <span class="tag tagcloud">胆囊炎</span>
+                                        <span class="tag tagcloud">胆结石</span>
+                                        <span class="tag tagcloud">胃癌</span>
+                                        <span class="tag tagcloud">食管癌</span>
+                                        <span class="tag tagcloud">肠癌</span>
+                                        <span class="tag tagcloud">宫颈癌</span>
+                                        <span class="tag tagcloud">前列腺癌</span>
+                                        <span class="tag tagcloud">肺癌</span>
+                                        <span class="tag tagcloud">白血病</span>
+                                        <span class="tag tagcloud">淋巴癌</span>
+                                        <span class="tag tagcloud">骨髓瘤</span>
+                                        <span class="tag tagcloud">乳腺癌</span>
+                                        <span class="tag tagcloud">结直肠癌</span>
+                                        <span class="tag tagcloud">胰腺癌</span>
+                                        <span class="tag tagcloud">卵巢癌</span>
+                                        <span class="tag tagcloud">食管癌</span>
+                                        <span class="tag tagcloud">肝癌</span>
+
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <canvas id="myChart2"></canvas>
+                                    <span id="myChart2Labels" th:utext="${doctorIllnessJson}"
+                                          style="display:none"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <canvas id="myChart4"></canvas>
+                                    <span id="myChart4Labels" th:utext="${doctorInfoJson}" style="display:none"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <canvas id="myChart5"></canvas>
+                                    <span id="myChart5Labels" th:utext="${doctorInfoJson}" style="display:none"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <canvas id="myChart6"></canvas>
+                                    <span id="myChart6Labels" th:utext="${doctorInfoJson}" style="display:none"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 封装自动滚动方法
+    function autoScrollTable(tableId, scrollSpeed = 50, scrollStep = 1) {
+        const table = document.getElementById(tableId);
+        if (!table) {
+            console.error(`Table with ID ${tableId} not found.`);
+            return;
+        }
+
+        let scrollInterval;
+        let currentScroll = 0;
+        const maxScroll = table.scrollHeight - table.clientHeight;
+
+        function startAutoScroll() {
+            scrollInterval = setInterval(() => {
+                if (currentScroll < maxScroll) {
+                    currentScroll += scrollStep;
+                } else {
+                    currentScroll = 0; // 重置滚动位置
+                }
+                table.scrollTop = currentScroll;
+            }, scrollSpeed);
+        }
+
+        function stopAutoScroll() {
+            clearInterval(scrollInterval);
+        }
+
+        // 监听鼠标悬停事件
+        table.addEventListener('mouseenter', stopAutoScroll);
+        table.addEventListener('mouseleave', startAutoScroll);
+
+        // 启动自动滚动
+        startAutoScroll();
+    }
+
+    // 调用自动滚动方法
+    autoScrollTable('scroll-table1', 50, 1);
+    autoScrollTable('scroll-table2', 50, 1);
+    autoScrollTable('scroll-table3', 50, 1);
+</script>
+
+<script>
+    // 生成随机颜色的函数
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    // 生成随机字体大小的函数
+    function getRandomSize() {
+        return Math.floor(Math.random() * (24 - 12 + 1)) + 12 + 'px';  // 字体大小范围 12px 到 24px
+    }
+
+    // 页面加载时，给每个标签设置随机颜色和字体大小
+    window.onload = function () {
+        const tags = document.querySelectorAll('.tag');
+        tags.forEach(tag => {
+            tag.style.backgroundColor = getRandomColor();  // 设置随机背景色
+            tag.style.fontSize = getRandomSize();  // 设置随机字体大小
+        });
+    }
+</script>
+
+
+<div th:replace="common/common-bar::#back"></div>
+<div th:replace="common/common-bar::#footer"></div>
+<div th:replace="common/common-bar::#search"></div>
+<div th:replace="common/common-bar::#back-to-top"></div>
+
+<script src="assets/js/jquery-3.5.1.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/plugin.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/custom-nav.js"></script>
+<script src="assets/js/jpanelmenu.min.js"></script>
+<script src="assets/js/dashboard-custom.js"></script>
+<script src="common/utils/reg.js"></script>
+<script src="common/layer/layer.js"></script>
+<script src="common/custom.js"></script>
+
+<script>
+    const ctx1 = document.getElementById('myChart1');
+    const ctx2 = document.getElementById('myChart2');
+    const ctx4 = document.getElementById('myChart4');
+    const ctx5 = document.getElementById('myChart5');
+    const ctx6 = document.getElementById('myChart6');
+
+    new Chart(ctx1, {
+        type: 'pie',
+        data: {
+            labels: eval(document.getElementById("myChart1Labels").textContent),
+            datasets: [{
+                label: '系统科室疾病数量',
+                data: [[${illnessCountList}]],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: eval(document.getElementById("myChart4Labels").textContent),
+            datasets: [{
+                label: '科室评价门诊价格',
+                data: [[${doctorInfoFeeList}]],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+    new Chart(ctx4, {
+        data: {
+            datasets: [{
+                type: 'bar',
+                label: '总医生数',
+                data: [[${doctorInfoTotalCountList}]]
+            }, {
+                type: 'line',
+                label: '主任医师数',
+                data: [[${doctorInfoMainCountList}]]
+            }, {
+                type: 'line',
+                label: '副主任医师数',
+                data: [[${doctorInfoSubCountList}]]
+            }
+            ],
+            labels: eval(document.getElementById("myChart4Labels").textContent),
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(ctx5, {
+        data: {
+            datasets: [{
+                type: 'line',
+                label: '主任医师比例',
+                data: [[${doctorInfoMainRateList}]]
+            }, {
+                type: 'line',
+                label: '副主任医师比例',
+                data: [[${doctorInfoSubRateList}]]
+            }
+            ],
+            labels: eval(document.getElementById("myChart4Labels").textContent),
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(ctx6, {
+        data: {
+            datasets: [{
+                type: 'bar',
+                label: '总问诊量（万次）',
+                data: [[${doctorInfoTotalVisitsList}]]
+            }, {
+                type: 'line',
+                label: '平均得分',
+                data: [[${doctorInfoAverageEvaluationList}]]
+            }
+            ],
+            labels: eval(document.getElementById("myChart4Labels").textContent),
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+</script>
+</body>
+</html>
