@@ -1,6 +1,5 @@
-## 项目介绍
 
-智慧医药系统（smart_medicine）是一个基于 SpringBoot 开发的 Java Web 项目。整体页面非常的简约大气，整合了目前非常火爆的 AIGC 生成式 AI（选用的阿里的通义千问大语言模型）技术充当智能医生
+smart_medicine是一个基于 SpringBoot 开发的 Java Web 项目
 
 ### 角色介绍
 
@@ -89,7 +88,6 @@
 
 本项目使用标准 SSM 目录结构，后端使用 MVC 三层架构，具体项目结构如下：
 
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161843032.png)
 
 - src：源码目录
 - src/main/java：源码主体目录
@@ -106,49 +104,3 @@
 - src/main/resources/application.yml：SpringBoot配置文件
 - pom.xml：Maven项目依赖管理文件
 
-> 注意！如果想要部署本项目，你只需要修改一个文件：application.yml
->
-> 1. 修改数据源配置
-> 2. 修改邮件配置 [开源项目部署环境准备](http://xuewei.world/archives/1700750925083)
-> 3. 阿里云通义千问配置 [如何开通并创建API-KEY-阿里云帮助中心](https://help.aliyun.com/zh/dashscope/developer-reference/activate-dashscope-and-create-an-api-key?spm=a2c4g.11186623.0.0.1cba47098FKXWk)
-> 4. 阿里云对象存储配置 [开源项目部署环境准备](http://xuewei.world/archives/1700750925083)
->
-> 注意 MySQL 的版本是 5.7，使用其它版本可能会出现其它未知问题。
-
-## 系统截图
-
-### 系统主页
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161901298.png)
-
-### 搜索一下
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161903966.png)
-
-### 疾病百科
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161904318.png)
-
-### 疾病信息
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161904682.png)
-
-### 查找药品
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161906091.png)
-
-### 我的资料
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161907773.png)
-
-### 疾病管理
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161907612.png)
-
-### 药品管理
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161908434.png)
-
-### 智能医生
-
-![](https://xuewei-blog.oss-cn-beijing.aliyuncs.com/202312161911175.png)
